@@ -21,10 +21,10 @@ import net.lucode.hackware.magicindicator.buildins.commonnavigator.titles.Simple
 public class IndicatorUtils {
 
     public static SimplePagerTitleView getSimplePagerTitleView(Context context, String title, View.OnClickListener onClickListener) {
-        SimplePagerTitleView simplePagerTitleView = new SimplePagerTitleView(context);
+        SimplePagerTitleView simplePagerTitleView = new ScaleTransitionPagerTitleView(context);
         simplePagerTitleView.setNormalColor(Color.parseColor("#FFFFFF"));
         simplePagerTitleView.setSelectedColor(Color.parseColor("#FFFFFF"));
-        simplePagerTitleView.setTextSize(17);
+        simplePagerTitleView.setTextSize(16);
         simplePagerTitleView.setText(title);
         int padding = UIUtil.dip2px(context, 7);
         simplePagerTitleView.setPadding(padding, 0, padding, 0);

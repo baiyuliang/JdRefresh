@@ -5,8 +5,10 @@ import androidx.fragment.app.Fragment;
 
 import android.os.Bundle;
 import android.os.Handler;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.byl.jdrefresh.adapter.HomeFragmentPageAdapter;
@@ -24,8 +26,10 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    LinearLayout ll_search;
     RelativeLayout rlTop;
+    LinearLayout ll_search;
+    TextView tv_search;
+    ImageView iv_message;
     JdScrollView jdScrollView;
 
     @Override
@@ -35,6 +39,8 @@ public class MainActivity extends AppCompatActivity {
 
         ll_search = findViewById(R.id.ll_search);
         rlTop = findViewById(R.id.rl_top);
+        tv_search = findViewById(R.id.tv_search);
+        iv_message = findViewById(R.id.iv_message);
         jdScrollView = findViewById(R.id.jdScrollView);
 
         StatusBarUtil.immersive(this);
@@ -49,6 +55,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onPull(int alpha) {
                 rlTop.getBackground().mutate().setAlpha(alpha);
+                ll_search.getBackground().mutate().setAlpha(alpha);
+                tv_search.setAlpha(alpha);
+                iv_message.getDrawable().setAlpha(alpha);
             }
 
             @Override
@@ -66,13 +75,22 @@ public class MainActivity extends AppCompatActivity {
     private void initData() {
         List<String> listTitle = new ArrayList<>();
         List<Fragment> listFragments = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
-            listTitle.add("Tab" + (i + 1));
-            if (i == 0)
-                listFragments.add(HomePageFragment.getInstance());
-            else
-                listFragments.add(OtherPageFragment.getInstance());
-        }
+
+        listTitle.add("首页");
+        listFragments.add(HomePageFragment.getInstance());
+        listTitle.add("手机");
+        listFragments.add(OtherPageFragment.getInstance());
+        listTitle.add("男装");
+        listFragments.add(OtherPageFragment.getInstance());
+        listTitle.add("电脑办公");
+        listFragments.add(OtherPageFragment.getInstance());
+        listTitle.add("生鲜");
+        listFragments.add(OtherPageFragment.getInstance());
+        listTitle.add("数码");
+        listFragments.add(OtherPageFragment.getInstance());
+        listTitle.add("医药健康");
+        listFragments.add(OtherPageFragment.getInstance());
+
         CommonNavigator commonNavigator = new CommonNavigator(this);
         HomeNavigatorAdapter commonNavigatorAdapter = new HomeNavigatorAdapter(listTitle, jdScrollView.getViewPager());
         commonNavigator.setAdapter(commonNavigatorAdapter);

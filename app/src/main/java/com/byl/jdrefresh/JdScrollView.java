@@ -17,6 +17,7 @@ import androidx.core.widget.NestedScrollView;
 import androidx.viewpager.widget.ViewPager;
 
 import com.byl.jdrefresh.adapter.HomeNavigatorAdapter;
+import com.byl.jdrefresh.utils.AnimUtils;
 import com.byl.jdrefresh.utils.StatusBarUtil;
 import com.byl.jdrefresh.utils.SysUtils;
 
@@ -40,7 +41,7 @@ public class JdScrollView extends NestedScrollView {
     private CustomViewPager viewPager;
 
     private int marginTop, paddingTop;
-    private static final float REFRESH_RATIO = 3.0f;//下拉系数（阻尼系数）,越大下拉灵敏度越低
+    private static final float REFRESH_RATIO = 2.0f;//下拉系数（阻尼系数）,越大下拉灵敏度越低
     private static final int AD_START_SCROLL_DISTANCE = 100;//广告图开始滑动的距离阈值（超过该值时才开始滑动）
     private static final int REFRESHL_DISTANCE = 150;//刷新距离阈值（超过该值时才开始刷新）
     private float startY = -1,//手指起始触摸位置
@@ -163,7 +164,6 @@ public class JdScrollView extends NestedScrollView {
                         RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) iv_ad.getLayoutParams();
                         if (layoutParams.topMargin < 0) {
                             adScrollDistance = (int) (distance - AD_START_SCROLL_DISTANCE);
-                            layoutView(adScrollDistance);
                             layoutAd(marginTop + adScrollDistance);
                         }
                     }
@@ -181,7 +181,6 @@ public class JdScrollView extends NestedScrollView {
                     oldDistance = distance;
                     return true;
                 } else if (scrollY == 0 && maxOffsetY > 0 && offsetY <= 0) {
-                    layoutView(0);
                     layoutAd(marginTop);
                     iv_ad.setImageAlpha(0);
                     ll_content.setPadding(0, paddingTop, 0, 0);
@@ -198,39 +197,21 @@ public class JdScrollView extends NestedScrollView {
                         isInterceptTouch = true;
                         REFRESH_STATUS = REFRESHING;//刷新中
                         viewPager.setRefreshing(true);
-                        ValueAnimator animator = ValueAnimator.ofInt(adScrollDistance);
-                        animator.setDuration(200);
-                        animator.start();
-                        animator.addUpdateListener(animation -> {
-                            int value = (int) animation.getAnimatedValue();
-                            layoutView(adScrollDistance - value);
-                            layoutAd(marginTop + adScrollDistance - value);
-                            ll_content.setPadding(0, (int) (paddingTop + oldDistance - value), 0, 0);
-                        });
-                        animator.addListener(new Animator.AnimatorListener() {
+                        AnimUtils.start(adScrollDistance, 200, new AnimUtils.OnAnimListener() {
                             @Override
-                            public void onAnimationStart(Animator animation) {
-
+                            public void onUpdate(int value) {
+                                layoutAd(marginTop + adScrollDistance - value);
+                                ll_content.setPadding(0, (int) (paddingTop + oldDistance - value), 0, 0);
                             }
 
                             @Override
-                            public void onAnimationEnd(Animator animation) {
+                            public void onEnd() {
                                 tv_refresh_state.setText("正在刷新...");
                                 reset();
                                 if (onPullListener != null) {
                                     onPullListener.onPull(0);
                                     onPullListener.onRefresh();
                                 }
-                            }
-
-                            @Override
-                            public void onAnimationCancel(Animator animation) {
-
-                            }
-
-                            @Override
-                            public void onAnimationRepeat(Animator animation) {
-
                             }
                         });
                     } else {//没有触动刷新，直接复位
@@ -240,53 +221,33 @@ public class JdScrollView extends NestedScrollView {
                             viewPager.setRefreshing(false);
                             isInterceptScroll = false;
                             REFRESH_STATUS = REFRESH_DONE;
-                            layoutView(0);
                             layoutAd(marginTop);
                             iv_ad.setImageAlpha(0);
                             if (onPullListener != null) onPullListener.onPull(255);
                             ll_content.setPadding(0, paddingTop, 0, 0);
                             reset();
                         } else {
-                            ValueAnimator animator = ValueAnimator.ofInt((int) oldDistance);
-                            animator.setDuration(150);
-                            animator.start();
-                            animator.addUpdateListener(animation -> {
-                                int value = (int) animation.getAnimatedValue();
-                                if (adScrollDistance > 0 && value <= adScrollDistance) {
-                                    layoutView(adScrollDistance - value);
-                                    layoutAd(marginTop + adScrollDistance - value);
-                                }
-                                ll_content.setPadding(0, paddingTop + (int) (oldDistance - value), 0, 0);
-                            });
-                            animator.addListener(new Animator.AnimatorListener() {
+                            AnimUtils.start((int) oldDistance, 150, new AnimUtils.OnAnimListener() {
                                 @Override
-                                public void onAnimationStart(Animator animation) {
-
+                                public void onUpdate(int value) {
+                                    if (adScrollDistance > 0 && value <= adScrollDistance) {
+                                        layoutAd(marginTop + adScrollDistance - value);
+                                    }
+                                    ll_content.setPadding(0, paddingTop + (int) (oldDistance - value), 0, 0);
                                 }
 
                                 @Override
-                                public void onAnimationEnd(Animator animation) {
+                                public void onEnd() {
                                     tv_refresh_state.setText("下拉刷新");
                                     isInterceptTouch = false;
                                     viewPager.setRefreshing(false);
                                     isInterceptScroll = false;
                                     REFRESH_STATUS = REFRESH_DONE;
-                                    layoutView(0);
                                     layoutAd(marginTop);
                                     iv_ad.setImageAlpha(0);
                                     if (onPullListener != null) onPullListener.onPull(255);
                                     ll_content.setPadding(0, paddingTop, 0, 0);
                                     reset();
-                                }
-
-                                @Override
-                                public void onAnimationCancel(Animator animation) {
-
-                                }
-
-                                @Override
-                                public void onAnimationRepeat(Animator animation) {
-
                                 }
                             });
                         }
@@ -295,12 +256,6 @@ public class JdScrollView extends NestedScrollView {
                 break;
         }
         return super.onTouchEvent(ev);
-    }
-
-    void layoutView(int marginTop) {
-        RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) view.getLayoutParams();
-        layoutParams.topMargin = marginTop;
-        view.setLayoutParams(layoutParams);
     }
 
     void layoutAd(int marginTop) {
@@ -317,43 +272,28 @@ public class JdScrollView extends NestedScrollView {
         maxOffsetY = 0;
     }
 
+    /**
+     * 刷新完成
+     */
     public void refreshFinish() {
-        ValueAnimator animator = ValueAnimator.ofInt(AD_START_SCROLL_DISTANCE);
-        animator.setDuration(100);
-        animator.start();
-        animator.addUpdateListener(animation -> {
-            int value = (int) animation.getAnimatedValue();
-            ll_content.setPadding(0, paddingTop + AD_START_SCROLL_DISTANCE - value, 0, 0);
-        });
-        animator.addListener(new Animator.AnimatorListener() {
+        AnimUtils.start(AD_START_SCROLL_DISTANCE, 100, new AnimUtils.OnAnimListener() {
             @Override
-            public void onAnimationStart(Animator animation) {
-
+            public void onUpdate(int value) {
+                ll_content.setPadding(0, paddingTop + AD_START_SCROLL_DISTANCE - value, 0, 0);
             }
 
             @Override
-            public void onAnimationEnd(Animator animation) {
+            public void onEnd() {
                 tv_refresh_state.setText("下拉刷新");
                 isInterceptTouch = false;
                 isInterceptScroll = false;
                 REFRESH_STATUS = REFRESH_DONE;
                 viewPager.setRefreshing(false);
-                layoutView(0);
                 layoutAd(marginTop);
                 iv_ad.setImageAlpha(0);
                 if (onPullListener != null) onPullListener.onPull(255);
                 ll_content.setPadding(0, paddingTop, 0, 0);
                 enableTab();
-            }
-
-            @Override
-            public void onAnimationCancel(Animator animation) {
-
-            }
-
-            @Override
-            public void onAnimationRepeat(Animator animation) {
-
             }
         });
     }

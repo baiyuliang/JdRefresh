@@ -34,6 +34,11 @@ public class CustomViewPager extends ViewPager {
             startY = 0;
             return true;
         }
+        return super.dispatchTouchEvent(ev);
+    }
+    
+     @Override
+    public boolean onInterceptTouchEvent(MotionEvent ev) {
         float x = ev.getRawX();
         float y = ev.getRawY();
         switch (ev.getAction()) {
@@ -44,12 +49,12 @@ public class CustomViewPager extends ViewPager {
             case MotionEvent.ACTION_MOVE:
                 float offsetX = Math.abs(x - startX);
                 float offsetY = Math.abs(y - startY);
-                if (offsetX >= offsetY) {//水平滑动自己处理
-                    return true;//消费掉
+                if (offsetX >= offsetY) {
+                    return false;
                 }
                 break;
         }
-        return super.dispatchTouchEvent(ev);
+        return super.onInterceptTouchEvent(ev);
     }
 
     @Override

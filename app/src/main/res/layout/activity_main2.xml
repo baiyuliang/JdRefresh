@@ -6,11 +6,25 @@
     android:focusable="true"
     android:focusableInTouchMode="true">
 
-    <com.byl.jdrefresh.v1.JdScrollView
-        android:id="@+id/jdScrollView"
+    <LinearLayout
+        android:id="@+id/ll_content"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fillViewport="true" />
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <net.lucode.hackware.magicindicator.MagicIndicator
+            android:id="@+id/magicIndicator"
+            android:layout_width="match_parent"
+            android:layout_height="35dp"
+            android:background="#acddee"
+            android:visibility="gone" />
+
+        <com.byl.jdrefresh.v1.CustomViewPager
+            android:id="@+id/customViewPager"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+    </LinearLayout>
 
     <RelativeLayout
         android:id="@+id/rl_top"
@@ -52,7 +66,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:src="@mipmap/icon_message" />
-
         </LinearLayout>
 
     </RelativeLayout>

@@ -1,4 +1,4 @@
-package com.byl.jdrefresh;
+package com.byl.jdrefresh.v1;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
@@ -11,6 +11,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.byl.jdrefresh.R;
 import com.byl.jdrefresh.adapter.HomeFragmentPageAdapter;
 import com.byl.jdrefresh.adapter.HomeNavigatorAdapter;
 import com.byl.jdrefresh.fragment.HomePageFragment;

@@ -13,9 +13,9 @@
     <ImageView
         android:id="@+id/iv_ad"
         android:layout_width="match_parent"
-        android:layout_height="500dp"
-        android:layout_marginTop="-320dp"
-        android:scaleType="fitXY"
+        android:layout_height="1000dp"
+        android:layout_marginTop="-820dp"
+        android:scaleType="centerCrop"
         android:src="@mipmap/bg_ad" />
 
     <LinearLayout
@@ -37,10 +37,12 @@
             android:layout_width="match_parent"
             android:layout_height="35dp" />
 
-        <com.byl.jdrefresh.CustomViewPager
-            android:id="@+id/viewPager"
+        <com.byl.jdrefresh.v2.CustomRecyclerView
+            android:id="@+id/recyclerView"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:layout_marginHorizontal="15dp"
+            android:nestedScrollingEnabled="false" />
 
     </LinearLayout>
 

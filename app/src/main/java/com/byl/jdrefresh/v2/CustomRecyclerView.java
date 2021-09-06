@@ -1,9 +1,10 @@
-package com.byl.jdrefresh;
+package com.byl.jdrefresh.v2;
 
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 
+import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
 
 /**
@@ -12,17 +13,17 @@ import androidx.viewpager.widget.ViewPager;
  * @Date : 2020-08-22
  * @Desc :
  */
-public class CustomViewPager extends ViewPager {
+public class CustomRecyclerView extends RecyclerView {
 
     private float startX;
     private float startY;
     private boolean isRefreshing;
 
-    public CustomViewPager(Context context) {
+    public CustomRecyclerView(Context context) {
         super(context);
     }
 
-    public CustomViewPager(Context context, AttributeSet attrs) {
+    public CustomRecyclerView(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
@@ -50,11 +51,6 @@ public class CustomViewPager extends ViewPager {
                 break;
         }
         return super.dispatchTouchEvent(ev);
-    }
-
-    @Override
-    public void setCurrentItem(int item) {
-        super.setCurrentItem(item, false);
     }
 
     public float getStartY() {

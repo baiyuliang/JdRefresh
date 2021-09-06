@@ -1,10 +1,11 @@
-package com.byl.jdrefresh;
+package com.byl.jdrefresh.v2;
 
-import android.animation.Animator;
-import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
+import android.os.Handler;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -14,8 +15,9 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.core.widget.NestedScrollView;
-import androidx.viewpager.widget.ViewPager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import com.byl.jdrefresh.R;
 import com.byl.jdrefresh.adapter.HomeNavigatorAdapter;
 import com.byl.jdrefresh.utils.AnimUtils;
 import com.byl.jdrefresh.utils.StatusBarUtil;
@@ -30,7 +32,7 @@ import net.lucode.hackware.magicindicator.buildins.commonnavigator.CommonNavigat
  * @Date : 2020-08-22
  * @Desc :
  */
-public class JdScrollView extends NestedScrollView {
+public class JdScrollView2 extends NestedScrollView {
 
     private Context context;
     private View view;
@@ -38,7 +40,7 @@ public class JdScrollView extends NestedScrollView {
     private LinearLayout ll_content;
     private TextView tv_refresh_state;
     private MagicIndicator magicIndicator;
-    private CustomViewPager viewPager;
+    private CustomRecyclerView recyclerView;
 
     private int marginTop, paddingTop;
     private static final float REFRESH_RATIO = 2.0f;//下拉系数（阻尼系数）,越大下拉灵敏度越低
@@ -60,66 +62,48 @@ public class JdScrollView extends NestedScrollView {
 
     private static int REFRESH_STATUS = PULL_TO_REFRESH;
 
-    private boolean disable;
+    private int screenHeight;//屏幕高度
+    private int imageShowHeight = 180;//背景图露出的高度(dp)
+    private int topRemainHeight;//不知道该起什么名字了,这个高度是指,背景图露出的高度内，除去状态栏高度和搜索栏高度后剩余的高度
 
-    public JdScrollView(Context context) {
+    public JdScrollView2(Context context) {
         super(context);
         init(context);
     }
 
-    public JdScrollView(Context context, AttributeSet attrs) {
+    public JdScrollView2(Context context, AttributeSet attrs) {
         super(context, attrs);
         init(context);
     }
 
-    public JdScrollView(Context context, AttributeSet attrs, int defStyleAttr) {
+    public JdScrollView2(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         init(context);
     }
 
     {
-        LayoutInflater.from(getContext()).inflate(R.layout.fragment_home_content, this, true);
+        LayoutInflater.from(getContext()).inflate(R.layout.layout_jd_scrollview2, this, true);
         view = findViewById(R.id.view);
         iv_ad = findViewById(R.id.iv_ad);
         ll_content = findViewById(R.id.ll_content);
         tv_refresh_state = findViewById(R.id.tv_refresh_state);
         magicIndicator = findViewById(R.id.magicIndicator);
-        viewPager = findViewById(R.id.viewPager);
+        recyclerView = findViewById(R.id.recyclerView);
     }
 
     void init(Context context) {
         this.context = context;
         setOverScrollMode(OVER_SCROLL_NEVER);
+        screenHeight = SysUtils.getScreenHeight(context);
+        topRemainHeight = SysUtils.Dp2Px(context, imageShowHeight) - StatusBarUtil.getStatusBarHeight(context) - SysUtils.Dp2Px(context, 40);//40是搜索栏高度，是多少就写多少
+        //为什么图片高度要在屏幕高度的基础上多加了topRemainHeight呢，这个是在自动全屏并跳转时，能将顶部的tab栏完全隐藏掉，具体可看博客详解
+        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, screenHeight + topRemainHeight);
+        marginTop = -(screenHeight + topRemainHeight - SysUtils.Dp2Px(context, imageShowHeight));
+        layoutParams.topMargin = marginTop;
+        iv_ad.setLayoutParams(layoutParams);
         iv_ad.setImageAlpha(0);
-        marginTop = -SysUtils.Dp2Px(context, 320);
         paddingTop = StatusBarUtil.getStatusBarHeight(context);
         ll_content.setPadding(0, paddingTop, 0, 0);
-
-        //以下是模拟动态设置viewPager高度
-        viewPager.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, SysUtils.Dp2Px(context, 2600)));
-        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
-            }
-
-            @Override
-            public void onPageSelected(int position) {
-                if (position == 0) disable = false;
-                else disable = true;
-                if (position == 0) {
-                    viewPager.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, SysUtils.Dp2Px(context, 2600)));
-                } else {
-                    viewPager.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
-                }
-
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-
-            }
-        });
     }
 
     @Override
@@ -130,23 +114,22 @@ public class JdScrollView extends NestedScrollView {
 
     @Override
     protected void onOverScrolled(int scrollX, int scrollY, boolean clampedX, boolean clampedY) {
-        if (!disable && !isInterceptScroll)
+        if (!isInterceptScroll)
             super.onOverScrolled(scrollX, scrollY, clampedX, clampedY);
     }
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
     public boolean onTouchEvent(MotionEvent ev) {
-        if (disable) return true;
-        startY = viewPager.getStartY() == 0 ? ev.getRawY() : viewPager.getStartY();//先走的是ViewPager的OnTouch，所以从ViewPager取startY最准确
+        startY = recyclerView.getStartY() == 0 ? ev.getRawY() : recyclerView.getStartY();//先走的是recyclerView的OnTouch，所以从recyclerView取startY最准确
         switch (ev.getAction()) {
             case MotionEvent.ACTION_MOVE:
                 //禁止触摸事件 以及 正在刷新时 禁止MOVE
                 if (isInterceptTouch || REFRESH_STATUS == REFRESHING) return true;
                 //这一步为了解决正在刷新时，手指又下拉，导致刷新完成时立马又自动下拉到了手指位置：
-                //由于ViewPager做了dispatchTouchEvent监听，所以上面的情况只会出现在startY != 0 && viewPager.getStartY() == 0这个条件下，
+                //由于recyclerView做了dispatchTouchEvent监听，所以上面的情况只会出现在startY != 0 && recyclerView.getStartY() == 0这个条件下，
                 //其它条件两者都是相等的
-                if (startY != 0 && viewPager.getStartY() == 0) return true;
+                if (startY != 0 && recyclerView.getStartY() == 0) return true;
                 //如果是先向下滑动，然后不松开手指，又返回向上滑动
                 if (maxOffsetY > 0 && maxOffsetY > offsetY) scrollY = 0;
                 //如果是向上滑动，则不处理
@@ -170,6 +153,7 @@ public class JdScrollView extends NestedScrollView {
                     if (distance > REFRESHL_DISTANCE) {
                         REFRESH_STATUS = RELEASE_TO_REFRESH;
                         tv_refresh_state.setText("释放刷新");
+
                     } else {
                         REFRESH_STATUS = PULL_TO_REFRESH;
                         tv_refresh_state.setText("下拉刷新");
@@ -190,13 +174,41 @@ public class JdScrollView extends NestedScrollView {
                 }
                 break;
             case MotionEvent.ACTION_UP:
+                if (adScrollDistance > 500) {
+                    isInterceptTouch = true;
+                    AnimUtils.start(-(int) (marginTop + adScrollDistance), 500, new AnimUtils.OnAnimListener() {
+                        @Override
+                        public void onUpdate(int value) {
+                            layoutAd(marginTop + adScrollDistance + value);
+                            ll_content.setPadding(0, (int) (paddingTop + adScrollDistance + AD_START_SCROLL_DISTANCE) + value, 0, 0);
+                        }
+
+                        @Override
+                        public void onEnd() {
+                            context.startActivity(new Intent(context, AdActivity.class));
+                            new Handler().postDelayed(() -> {
+                                tv_refresh_state.setText("下拉刷新");
+                                isInterceptTouch = false;
+                                recyclerView.setRefreshing(false);
+                                isInterceptScroll = false;
+                                REFRESH_STATUS = REFRESH_DONE;
+                                layoutAd(marginTop);
+                                iv_ad.setImageAlpha(0);
+                                if (onPullListener != null) onPullListener.onPull(255);
+                                ll_content.setPadding(0, paddingTop, 0, 0);
+                                reset();
+                            }, 300);
+                        }
+                    });
+                    return true;
+                }
                 isInterceptTouch = false;
                 if (maxOffsetY > 0) {
                     if (REFRESH_STATUS == RELEASE_TO_REFRESH) {//释放刷新
                         disableTab();
                         isInterceptTouch = true;
                         REFRESH_STATUS = REFRESHING;//刷新中
-                        viewPager.setRefreshing(true);
+                        recyclerView.setRefreshing(true);
                         AnimUtils.start(adScrollDistance, 200, new AnimUtils.OnAnimListener() {
                             @Override
                             public void onUpdate(int value) {
@@ -218,7 +230,7 @@ public class JdScrollView extends NestedScrollView {
                         if (offsetY <= 0) {//手指松开时如果已经滑动到顶部，则不需要再执行动画
                             tv_refresh_state.setText("下拉刷新");
                             isInterceptTouch = false;
-                            viewPager.setRefreshing(false);
+                            recyclerView.setRefreshing(false);
                             isInterceptScroll = false;
                             REFRESH_STATUS = REFRESH_DONE;
                             layoutAd(marginTop);
@@ -240,7 +252,7 @@ public class JdScrollView extends NestedScrollView {
                                 public void onEnd() {
                                     tv_refresh_state.setText("下拉刷新");
                                     isInterceptTouch = false;
-                                    viewPager.setRefreshing(false);
+                                    recyclerView.setRefreshing(false);
                                     isInterceptScroll = false;
                                     REFRESH_STATUS = REFRESH_DONE;
                                     layoutAd(marginTop);
@@ -288,7 +300,7 @@ public class JdScrollView extends NestedScrollView {
                 isInterceptTouch = false;
                 isInterceptScroll = false;
                 REFRESH_STATUS = REFRESH_DONE;
-                viewPager.setRefreshing(false);
+                recyclerView.setRefreshing(false);
                 layoutAd(marginTop);
                 iv_ad.setImageAlpha(0);
                 if (onPullListener != null) onPullListener.onPull(255);
@@ -344,8 +356,8 @@ public class JdScrollView extends NestedScrollView {
         return magicIndicator;
     }
 
-    public CustomViewPager getViewPager() {
-        return viewPager;
+    public RecyclerView getRecyclerView() {
+        return recyclerView;
     }
 
 }

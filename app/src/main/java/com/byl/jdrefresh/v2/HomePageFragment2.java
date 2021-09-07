@@ -9,6 +9,7 @@ import com.byl.jdrefresh.R;
 import com.byl.jdrefresh.adapter.HomeNavigatorAdapter;
 import com.byl.jdrefresh.adapter.ListAdapter;
 import com.byl.jdrefresh.fragment.BaseFragment;
+import com.scwang.smartrefresh.layout.api.RefreshLayout;
 
 import net.lucode.hackware.magicindicator.ViewPagerHelper;
 import net.lucode.hackware.magicindicator.buildins.UIUtil;
@@ -19,7 +20,11 @@ import java.util.List;
 
 public class HomePageFragment2 extends BaseFragment {
 
+    RefreshLayout refreshLayout;
     JdScrollView2 jdScrollView;
+
+    List<String> list;
+    ListAdapter adapter;
 
     public static HomePageFragment2 getInstance() {
         HomePageFragment2 fragment = new HomePageFragment2();
@@ -33,6 +38,13 @@ public class HomePageFragment2 extends BaseFragment {
 
     @Override
     public void initView() {
+        refreshLayout = contentView.findViewById(R.id.refreshLayout);
+        refreshLayout.setOnLoadMoreListener(refreshLayout -> new Handler().postDelayed(() -> {
+            list.add("Item新增");
+            adapter.notifyDataSetChanged();
+            refreshLayout.finishLoadMore();
+        }, 1000));
+
         jdScrollView = contentView.findViewById(R.id.jdScrollView);
         jdScrollView.setOnPullListener(new JdScrollView2.OnPullListener() {
             @Override
@@ -47,6 +59,7 @@ public class HomePageFragment2 extends BaseFragment {
                     jdScrollView.refreshFinish();
                 }, 1500);
             }
+
         });
 
         List<String> listTitle = new ArrayList<>();
@@ -73,11 +86,11 @@ public class HomePageFragment2 extends BaseFragment {
 
     @Override
     public void initData() {
-        List<String> list = new ArrayList<>();
+        list = new ArrayList<>();
         for (int i = 0; i < 20; i++) {
             list.add("Item" + i);
         }
-        ListAdapter adapter = new ListAdapter(mContext, list);
+        adapter = new ListAdapter(mContext, list);
         jdScrollView.getRecyclerView().setLayoutManager(new LinearLayoutManager(mContext));
         jdScrollView.getRecyclerView().setAdapter(adapter);
     }

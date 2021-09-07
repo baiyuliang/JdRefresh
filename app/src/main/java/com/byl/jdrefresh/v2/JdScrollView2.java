@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -41,6 +40,7 @@ public class JdScrollView2 extends NestedScrollView {
     private TextView tv_refresh_state;
     private MagicIndicator magicIndicator;
     private CustomRecyclerView recyclerView;
+
 
     private int marginTop, paddingTop;
     private static final float REFRESH_RATIO = 2.0f;//下拉系数（阻尼系数）,越大下拉灵敏度越低
@@ -89,11 +89,13 @@ public class JdScrollView2 extends NestedScrollView {
         tv_refresh_state = findViewById(R.id.tv_refresh_state);
         magicIndicator = findViewById(R.id.magicIndicator);
         recyclerView = findViewById(R.id.recyclerView);
+
     }
 
     void init(Context context) {
         this.context = context;
         setOverScrollMode(OVER_SCROLL_NEVER);
+        view.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, SysUtils.Dp2Px(context, imageShowHeight)));
         screenHeight = SysUtils.getScreenHeight(context);
         topRemainHeight = SysUtils.Dp2Px(context, imageShowHeight) - StatusBarUtil.getStatusBarHeight(context) - SysUtils.Dp2Px(context, 40);//40是搜索栏高度，是多少就写多少
         //为什么图片高度要在屏幕高度的基础上多加了topRemainHeight呢，这个是在自动全屏并跳转时，能将顶部的tab栏完全隐藏掉，具体可看博客详解

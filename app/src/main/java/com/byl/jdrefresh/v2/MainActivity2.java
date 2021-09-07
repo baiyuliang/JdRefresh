@@ -109,8 +109,8 @@ public class MainActivity2 extends AppCompatActivity {
         });
     }
 
-    public void setAlpha(int alpha){
-        rlTop.getBackground().mutate().setAlpha(alpha);
+    public void setAlpha(int alpha) {
+        rlTop.getBackground().mutate().setAlpha(alpha < 255 ? 0 : 255);
         ll_search.getBackground().mutate().setAlpha(alpha);
         tv_search.setAlpha(alpha);
         iv_message.getDrawable().setAlpha(alpha);

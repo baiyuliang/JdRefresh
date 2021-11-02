@@ -37,10 +37,10 @@ public class ListAdapter2 extends RecyclerView.Adapter<ListAdapter2.MyViewHolder
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
         String content = listData.get(position);
         if (position == 0) {
-            holder.fl_ad.setVisibility(View.VISIBLE);
+            holder.tv_snap.setVisibility(View.VISIBLE);
             holder.tv_content.setVisibility(View.GONE);
         } else {
-            holder.fl_ad.setVisibility(View.GONE);
+            holder.tv_snap.setVisibility(View.GONE);
             holder.tv_content.setVisibility(View.VISIBLE);
             holder.tv_content.setText(content);
         }
@@ -54,12 +54,12 @@ public class ListAdapter2 extends RecyclerView.Adapter<ListAdapter2.MyViewHolder
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
 
-        FrameLayout fl_ad;
+        TextView tv_snap;
         TextView tv_content;
 
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
-            fl_ad = itemView.findViewById(R.id.fl_ad);
+            tv_snap = itemView.findViewById(R.id.tv_snap);
             tv_content = itemView.findViewById(R.id.tv_content);
         }
     }

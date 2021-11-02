@@ -1,24 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/rl_content"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!--    高度在代码中动态设置-->
-    <ImageView
+    <View
         android:id="@+id/view"
         android:layout_width="match_parent"
-        android:layout_height="290dp"
+        android:layout_height="180dp"
+        android:background="#acddee" />
+
+    <ImageView
+        android:id="@+id/iv_ad"
+        android:layout_width="match_parent"
+        android:layout_height="1000dp"
+        android:layout_marginTop="-820dp"
         android:scaleType="centerCrop"
         android:src="@mipmap/bg_ad" />
 
-
-    <com.byl.jdrefresh.v2.CustomRecyclerView
-        android:id="@+id/recyclerView"
+    <LinearLayout
+        android:id="@+id/ll_content"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginHorizontal="15dp"
-        android:nestedScrollingEnabled="false" />
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tv_refresh_state"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:gravity="center"
+            android:text="下拉刷新"
+            android:textColor="#dddddd" />
+
+        <net.lucode.hackware.magicindicator.MagicIndicator
+            android:id="@+id/magicIndicator"
+            android:layout_width="match_parent"
+            android:layout_height="35dp" />
+
+        <com.byl.jdrefresh.v2.CustomRecyclerView
+            android:id="@+id/recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginHorizontal="15dp"
+            android:nestedScrollingEnabled="false" />
+
+    </LinearLayout>
 
 </RelativeLayout>
+

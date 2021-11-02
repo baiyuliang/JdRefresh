@@ -12,7 +12,7 @@
         <ImageView
             android:id="@+id/iv_ad"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:scaleType="fitXY" />
 
         <com.youth.banner.Banner
@@ -21,6 +21,13 @@
             android:layout_height="120dp"
             android:layout_marginHorizontal="20dp"
             android:layout_marginTop="120dp" />
+
+        <ImageView
+            android:id="@+id/iv_ad_bottom"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:layout_marginHorizontal="20dp" />
 
     </FrameLayout>
 

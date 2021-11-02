@@ -15,29 +15,49 @@
             android:id="@+id/mAppBarLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="#FFFFFF"
             app:elevation="0dp">
 
-            <com.byl.jdrefresh.v4.AdView
-                android:id="@+id/adView"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:layout_scrollFlags="scroll"/>
+                android:orientation="vertical"
+                app:layout_scrollFlags="scroll">
+
+                <com.byl.jdrefresh.v4.AdView
+                    android:id="@+id/adView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/mRecyclerViewGrid"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
 
         </com.google.android.material.appbar.AppBarLayout>
+
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/mRecyclerView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
+            app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
-    <ImageView
-        android:id="@+id/bg_search"
+    <FrameLayout
+        android:id="@+id/rl_bg_search"
         android:layout_width="match_parent"
-        android:layout_height="350dp"
-        android:scaleType="fitXY"
-        android:visibility="gone" />
+        android:layout_height="60dp">
+
+        <ImageView
+            android:id="@+id/bg_search"
+            android:layout_width="match_parent"
+            android:layout_height="350dp"
+            android:scaleType="fitXY" />
+
+    </FrameLayout>
 
     <RelativeLayout
         android:id="@+id/rl_search"
@@ -97,13 +117,13 @@
         android:id="@+id/tv_snap"
         android:layout_width="match_parent"
         android:layout_height="35dp"
-        android:layout_below="@+id/bg_search"
+        android:layout_below="@+id/rl_bg_search"
         android:background="#00FFFF"
-        android:visibility="gone"
         android:gravity="center_vertical"
         android:paddingLeft="15dp"
         android:text="吸顶"
-        android:textColor="#FF0000" />
+        android:textColor="#FF0000"
+        android:visibility="gone" />
 
 
 </RelativeLayout>

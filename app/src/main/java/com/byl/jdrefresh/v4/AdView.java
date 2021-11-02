@@ -47,30 +47,36 @@ public class AdView extends FrameLayout {
         vb = ViewAdBinding.inflate(LayoutInflater.from(getContext()), this, true);
     }
 
-    public void setData(String adUrl, List<String> bannerUrls) {
-        Glide.with(context)
-                .load(adUrl)
-                .into(vb.ivAd);
+    public void setData(String adUrl, String adBottomUrl,List<String> bannerUrls) {
+        Glide.with(context).load(adUrl).into(vb.ivAd);
+        Glide.with(context).load(adBottomUrl).into(vb.ivAdBottom);
         vb.banner.setAdapter(new BannerImageAdapter<String>(bannerUrls) {
             @Override
             public void onBindView(BannerImageHolder holder, String data, int position, int size) {
-                //图片加载自己实现
-                Glide.with(holder.itemView)
-                        .load(data)
-                        .apply(RequestOptions.bitmapTransform(new RoundedCorners(15)))
-                        .into(holder.imageView);
+                Glide.with(holder.itemView).load(data).into(holder.imageView);
             }
         }).addBannerLifecycleObserver(context).setIndicator(new CircleIndicator(context));
     }
 
-    //根据设计素材尺寸动态设置
-    public void setAdHeight(int height) {
+    public void setHeight(int height) {
         vb.flAd.setLayoutParams(new LinearLayout.LayoutParams(-1, height));
     }
 
+    //根据设计素材尺寸动态设置
+    public void setAdLayoutParams(int height) {
+        vb.ivAd.setLayoutParams(new FrameLayout.LayoutParams(-1, height));
+    }
+
+    //根据设计素材尺寸动态设置
+    public void setAdBottomLayoutParams(int width, int height) {
+        FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(width, height);
+        layoutParams.gravity = Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL;
+        vb.ivAdBottom.setLayoutParams(layoutParams);
+    }
+
     //banner宽高根据设计素材尺寸动态设置
-    public void setBannerLayoutParams(int horizontalMargin, int height, int topMargin) {
-        LayoutParams layoutParams = new LayoutParams(SysUtils.getScreenWidth(context) - horizontalMargin, height);
+    public void setBannerLayoutParams(int width, int height, int topMargin) {
+        LayoutParams layoutParams = new LayoutParams(width, height);
         layoutParams.gravity = Gravity.CENTER_HORIZONTAL;
         //显示的位置（距离顶部的距离，根据设计素材实现）
         layoutParams.topMargin = topMargin;

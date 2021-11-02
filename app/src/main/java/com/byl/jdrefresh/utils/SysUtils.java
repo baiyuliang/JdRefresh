@@ -14,4 +14,10 @@ public class SysUtils {
         int height = wm.getDefaultDisplay().getHeight();
         return height;
     }
+
+    public static int getScreenWidth(Context context) {
+        WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        int height = wm.getDefaultDisplay().getWidth();
+        return height;
+    }
 }

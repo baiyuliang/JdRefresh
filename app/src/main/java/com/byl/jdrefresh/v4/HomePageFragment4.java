@@ -133,6 +133,7 @@ public class HomePageFragment4 extends BaseFragment {
 
     @Override
     public void initData() {
+        //在线图片若无法访问，可以使用mipmap中资源图片
         String adUrl = "https://oss.yanlu18.com/user/617d02df889ab579ee640895.png";
         String adBottomUrl = "https://oss.yanlu18.com/user/617d4c93889ad28d5b82b821.png";
         List<String> bannerUrls = new ArrayList<>();
@@ -142,7 +143,6 @@ public class HomePageFragment4 extends BaseFragment {
 
         Glide.with(mContext).load(adUrl).into(bg_search);
         adView.setData(adUrl, adBottomUrl, bannerUrls);
-
 
         List list = new ArrayList<>();
         for (int i = 0; i < 20; i++) {
